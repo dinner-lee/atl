@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Teacher-Calibrated Discussion Dashboard</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <div>
+        <p class="eyebrow">Discussion Log Classifier</p>
+        <h1>교사 판단 기반 Pass/Fail 대시보드</h1>
+      </div>
+      <div class="header-actions">
+        <button id="download-csv" class="secondary-button" type="button">CSV 다운로드</button>
+        <button id="reset-app" class="secondary-button" type="button">초기화</button>
+      </div>
+    </header>
+
+    <nav class="tabs" aria-label="작업 단계">
+      <button class="tab active" type="button" data-view="labeling">1. 교사 판단 입력</button>
+      <button class="tab" type="button" data-view="model">2. 원 가중치 식</button>
+      <button class="tab" type="button" data-view="adjust">3. 가중치 조정 실험</button>
+    </nav>
+
+    <main>
+      <section id="labeling-view" class="view active">
+        <section class="summary-grid">
+          <article class="summary-card">
+            <span>학생 수</span>
+            <strong id="student-count"></strong>
+          </article>
+          <article class="summary-card">
+            <span>Pass 입력</span>
+            <strong id="pass-count"></strong>
+          </article>
+          <article class="summary-card">
+            <span>Fail 입력</span>
+            <strong id="fail-count"></strong>
+          </article>
+          <article class="summary-card">
+            <span>모델 상태</span>
+            <strong id="model-status"></strong>
+          </article>
+        </section>
+
+        <section class="panel">
+          <div class="panel-heading">
+            <div>
+              <h2>학생별 토론 로그와 교사 판단</h2>
+              <p>더미 CSV 지표를 보고 각 학생의 Pass/Fail을 직접 지정합니다. 기본값은 예시 판단으로 채워져 있습니다.</p>
+            </div>
+            <button id="train-model" class="primary-button" type="button">로지스틱 회귀 학습</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead id="labeling-head"></thead>
+              <tbody id="labeling-body"></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+
+      <section id="model-view" class="view">
+        <section class="split-grid">
+          <section class="panel">
+            <div class="panel-heading">
+              <div>
+                <h2>학습된 원 가중치 식</h2>
+                <p>교사가 입력한 Pass/Fail 판단에 가장 가까워지도록 학습한 로지스틱 회귀식입니다.</p>
+              </div>
+            </div>
+            <div class="formula-box">
+              <code id="formula-text"></code>
+            </div>
+            <div class="model-metrics">
+              <div><span>정확도</span><strong id="accuracy"></strong></div>
+              <div><span>절편</span><strong id="intercept"></strong></div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-heading">
+              <div>
+                <h2>변수별 원 가중치</h2>
+                <p>값은 표준화된 입력 기준입니다. 양수는 Pass 가능성을 높이고, 음수는 낮춥니다.</p>
+              </div>
+            </div>
+            <div id="coefficient-list" class="coef-list"></div>
+          </section>
+        </section>
+
+        <section class="panel">
+          <div class="panel-heading">
+            <div>
+              <h2>모델 예측 결과</h2>
+              <p>교사 판단과 모델 예측을 비교합니다.</p>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>학생</th>
+                  <th>교사 판단</th>
+                  <th>모델 확률</th>
+                  <th>모델 예측</th>
+                  <th>일치</th>
+                </tr>
+              </thead>
+              <tbody id="prediction-body"></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+
+      <section id="adjust-view" class="view">
+        <section class="split-grid">
+          <section class="panel">
+            <div class="panel-heading">
+              <div>
+                <h2>양의 상관 변수</h2>
+                <p>교사 Pass 판단과 함께 증가한 변수입니다. 강한 변수부터 정렬됩니다.</p>
+              </div>
+            </div>
+            <div id="positive-correlations" class="correlation-list"></div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-heading">
+              <div>
+                <h2>음의 상관 변수</h2>
+                <p>교사 Pass 판단과 반대로 움직인 변수입니다. 강한 변수부터 정렬됩니다.</p>
+              </div>
+            </div>
+            <div id="negative-correlations" class="correlation-list"></div>
+          </section>
+        </section>
+
+        <section class="panel">
+          <div class="panel-heading">
+            <div>
+              <h2>가중치 조정 슬라이더</h2>
+              <p>상관이 강한 변수 순서로 제시됩니다. 조정 즉시 학생별 Pass/Fail 예측이 바뀝니다.</p>
+            </div>
+            <button id="restore-weights" class="secondary-button" type="button">원래 식으로 복원</button>
+          </div>
+          <div id="slider-list" class="slider-list"></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-heading">
+            <div>
+              <h2>조정 후 학생 판정</h2>
+              <p>현재 슬라이더 값으로 다시 계산한 결과입니다. 확률 0.5 이상이면 Pass입니다.</p>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>학생</th>
+                  <th>현재 확률</th>
+                  <th>현재 판정</th>
+                  <th>교사 판단</th>
+                  <th>변화</th>
+                </tr>
+              </thead>
+              <tbody id="adjusted-body"></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
