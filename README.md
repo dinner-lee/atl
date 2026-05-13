@@ -1,4 +1,4 @@
-# Teacher-Calibrated Discussion Dashboard
+# aTL: Adaptive Teaching and Learning
 
 교사가 학생별 Pass/Fail을 직접 입력하면, 그 판단에 가까운 로지스틱 회귀 가중치를 학습하고, 이후 교사가 슬라이더로 변수 가중치를 조정하며 학생별 Pass/Fail 변화를 관찰할 수 있는 적응적 대시보드입니다.
 
