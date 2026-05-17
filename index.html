@@ -1,179 +1,84 @@
 <!doctype html>
 <html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Teacher-Calibrated Discussion Dashboard</title>
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <header class="app-header">
-      <div>
-        <p class="eyebrow">Discussion Log Classifier</p>
-        <h1>교사 판단 기반 Pass/Fail 대시보드</h1>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI-Adaptive Teacher Dashboard</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+</head>
+
+<body>
+  <div class="app-container">
+    <header class="top-nav">
+      <div class="logo">
+        <span class="logo-icon">
+          <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary);"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
+        </span>
+        <span class="logo-text">맞춤형 학습분석 대시보드: aTL</span>
       </div>
-      <div class="header-actions">
-        <button id="download-csv" class="secondary-button" type="button">CSV 다운로드</button>
-        <button id="reset-app" class="secondary-button" type="button">초기화</button>
+      
+      <button class="hamburger-menu" id="hamburger-btn" onclick="toggleMobileMenu()">
+        <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+
+      <nav class="main-menu" id="main-menu">
+        <button class="nav-item active" data-tab="dashboard" onclick="setView('dashboard')">
+          <span class="nav-icon">
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+          </span> 대시보드
+        </button>
+        <button class="nav-item" data-tab="calendar" onclick="setView('calendar')">
+          <span class="nav-icon">
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+          </span> 캘린더
+        </button>
+        <button class="nav-item" data-tab="profile" onclick="setView('profile')">
+          <span class="nav-icon">
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </span> 학생 정보 관리
+        </button>
+      </nav>
+      <div class="nav-actions">
+        <div class="compact-user-info">
+          <span class="user-greeting">김OO 선생님, 안녕하세요.</span>
+          <span class="user-subject">국어 교과</span>
+          
+          <div class="user-profile-dropdown">
+            <div class="dropdown-header">
+              <div class="dropdown-avatar">김</div>
+              <div class="dropdown-info">
+                <strong>김OO 선생님</strong>
+                <p id="dropdown-class-count">국어 교과 담당 | 총 8개 학급 지도 중</p>
+              </div>
+            </div>
+            <div class="dropdown-actions">
+              <button class="settings-btn" onclick="alert('내 정보 수정 설정 창이 열립니다.')">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                내 정보 수정
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </header>
 
-    <nav class="tabs" aria-label="작업 단계">
-      <button class="tab active" type="button" data-view="labeling">1. 교사 판단 입력</button>
-      <button class="tab" type="button" data-view="model">2. 원 가중치 식</button>
-      <button class="tab" type="button" data-view="adjust">3. 가중치 조정 실험</button>
-    </nav>
-
-    <main>
-      <section id="labeling-view" class="view active">
-        <section class="summary-grid">
-          <article class="summary-card">
-            <span>학생 수</span>
-            <strong id="student-count"></strong>
-          </article>
-          <article class="summary-card">
-            <span>Pass 입력</span>
-            <strong id="pass-count"></strong>
-          </article>
-          <article class="summary-card">
-            <span>Fail 입력</span>
-            <strong id="fail-count"></strong>
-          </article>
-          <article class="summary-card">
-            <span>모델 상태</span>
-            <strong id="model-status"></strong>
-          </article>
-        </section>
-
-        <section class="panel">
-          <div class="panel-heading">
-            <div>
-              <h2>학생별 토론 로그와 교사 판단</h2>
-              <p>더미 CSV 지표를 보고 각 학생의 Pass/Fail을 직접 지정합니다. 기본값은 예시 판단으로 채워져 있습니다.</p>
-            </div>
-            <button id="train-model" class="primary-button" type="button">로지스틱 회귀 학습</button>
-          </div>
-          <div class="table-wrap">
-            <table>
-              <thead id="labeling-head"></thead>
-              <tbody id="labeling-body"></tbody>
-            </table>
-          </div>
-        </section>
-      </section>
-
-      <section id="model-view" class="view">
-        <section class="split-grid">
-          <section class="panel">
-            <div class="panel-heading">
-              <div>
-                <h2>학습된 원 가중치 식</h2>
-                <p>교사가 입력한 Pass/Fail 판단에 가장 가까워지도록 학습한 로지스틱 회귀식입니다.</p>
-              </div>
-            </div>
-            <div class="formula-box">
-              <code id="formula-text"></code>
-            </div>
-            <div class="model-metrics">
-              <div><span>정확도</span><strong id="accuracy"></strong></div>
-              <div><span>절편</span><strong id="intercept"></strong></div>
-            </div>
-          </section>
-
-          <section class="panel">
-            <div class="panel-heading">
-              <div>
-                <h2>변수별 원 가중치</h2>
-                <p>값은 표준화된 입력 기준입니다. 양수는 Pass 가능성을 높이고, 음수는 낮춥니다.</p>
-              </div>
-            </div>
-            <div id="coefficient-list" class="coef-list"></div>
-          </section>
-        </section>
-
-        <section class="panel">
-          <div class="panel-heading">
-            <div>
-              <h2>모델 예측 결과</h2>
-              <p>교사 판단과 모델 예측을 비교합니다.</p>
-            </div>
-          </div>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>학생</th>
-                  <th>교사 판단</th>
-                  <th>모델 확률</th>
-                  <th>모델 예측</th>
-                  <th>일치</th>
-                </tr>
-              </thead>
-              <tbody id="prediction-body"></tbody>
-            </table>
-          </div>
-        </section>
-      </section>
-
-      <section id="adjust-view" class="view">
-        <section class="split-grid">
-          <section class="panel">
-            <div class="panel-heading">
-              <div>
-                <h2>양의 상관 변수</h2>
-                <p>교사 Pass 판단과 함께 증가한 변수입니다. 강한 변수부터 정렬됩니다.</p>
-              </div>
-            </div>
-            <div id="positive-correlations" class="correlation-list"></div>
-          </section>
-
-          <section class="panel">
-            <div class="panel-heading">
-              <div>
-                <h2>음의 상관 변수</h2>
-                <p>교사 Pass 판단과 반대로 움직인 변수입니다. 강한 변수부터 정렬됩니다.</p>
-              </div>
-            </div>
-            <div id="negative-correlations" class="correlation-list"></div>
-          </section>
-        </section>
-
-        <section class="panel">
-          <div class="panel-heading">
-            <div>
-              <h2>가중치 조정 슬라이더</h2>
-              <p>상관이 강한 변수 순서로 제시됩니다. 조정 즉시 학생별 Pass/Fail 예측이 바뀝니다.</p>
-            </div>
-            <button id="restore-weights" class="secondary-button" type="button">원래 식으로 복원</button>
-          </div>
-          <div id="slider-list" class="slider-list"></div>
-        </section>
-
-        <section class="panel">
-          <div class="panel-heading">
-            <div>
-              <h2>조정 후 학생 판정</h2>
-              <p>현재 슬라이더 값으로 다시 계산한 결과입니다. 확률 0.5 이상이면 Pass입니다.</p>
-            </div>
-          </div>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>학생</th>
-                  <th>현재 확률</th>
-                  <th>현재 판정</th>
-                  <th>교사 판단</th>
-                  <th>변화</th>
-                </tr>
-              </thead>
-              <tbody id="adjusted-body"></tbody>
-            </table>
-          </div>
-        </section>
-      </section>
+    <main class="main-content">
+      <div class="views-wrapper" id="views-wrapper">
+        <div class="view-slide" id="view-dashboard"></div>
+        <div class="view-slide" id="view-calendar"></div>
+        <div class="view-slide" id="view-profile"></div>
+      </div>
     </main>
+  </div>
 
-    <script src="app.js"></script>
-  </body>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+
 </html>
